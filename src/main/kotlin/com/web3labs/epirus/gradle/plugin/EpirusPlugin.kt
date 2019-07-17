@@ -39,6 +39,7 @@ class EpirusPlugin : Plugin<Project> {
             val epirusExtension = project[EpirusExtension.NAME] as EpirusExtension
             it.dependsOn("compile${srcSetName}Solidity")
             it.source = buildSourceDirectorySet(sourceSet)
+            it.group = EpirusExtension.NAME
             it.url = epirusExtension.url
         }
     }
