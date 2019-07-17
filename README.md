@@ -1,6 +1,7 @@
 # Epirus Gradle Plugin
 
-Gradle Plugin for the Epirus Platform.
+Gradle Plugin for the [Epirus Platform](http://web3labs.com/) enabling the automation of smart contract lifecycle
+within your development environment.
 
 ## Plugin configuration
 
@@ -41,7 +42,7 @@ The plugin depends on the [web3j](https://github.com/web3j/web3j-gradle-plugin) 
 [Solidity](https://github.com/web3j/solidity-gradle-plugin) plugins so they will add tasks
 for compilation and generation of web3j contract wrappers.
 
-In addition, this plugin registers the task `uploadMetadata` which will upload automatically
+In addition, this plugin registers the task `uploadMetadata`, which will upload automatically
 the Solidity contract metadata files to your Epirus node.
 
 To customize the plugin with your node URL you can use the plugin extension DSL:
@@ -49,4 +50,9 @@ To customize the plugin with your node URL you can use the plugin extension DSL:
 epirus {
     url = 'http://user:password@your.epirus.node:port'
 }
+```
+
+To obtain a list and description of all added tasks, run the command:
+```bash
+./gradlew tasks --all
 ```
