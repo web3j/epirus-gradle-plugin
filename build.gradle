@@ -15,8 +15,6 @@ plugins {
     id 'idea'
 }
 
-group = 'com.web3labs.epirus'
-version = '1.0.0-SNAPSHOT'
 description = 'Gradle plugin providing tasks for the Epirus platform.'
 sourceCompatibility = JavaVersion.VERSION_1_8
 
