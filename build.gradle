@@ -76,7 +76,7 @@ gradlePlugin {
 pluginBundle {
     website = 'https://web3labs.com/'
     vcsUrl = 'https://github.com/web3j/epirus-gradle-plugin'
-    description = 'Gradle plugin providing tasks to generate web3j contracts from Solidity.'
+    description = 'Gradle plugin providing tasks for the Epirus platform.'
     tags = ['ethereum', 'web3.js', 'web3j', 'epirus', 'web3labs']
     plugins {
         epirus {
@@ -212,8 +212,8 @@ bintray {
         desc = project.description
         userOrg = 'web3j'
         licenses = ['Apache-2.0']
-        issueTrackerUrl = 'https://github.com/web3j/web3j-gradle-plugin/issues'
-        vcsUrl = 'https://github.com/web3j/web3j-gradle-plugin.git'
+        issueTrackerUrl = 'https://github.com/web3j/epirus-gradle-plugin/issues'
+        vcsUrl = 'https://github.com/web3j/epirus-gradle-plugin.git'
         websiteUrl = 'http://web3j.io'
         publicDownloadNumbers = true
         version {
