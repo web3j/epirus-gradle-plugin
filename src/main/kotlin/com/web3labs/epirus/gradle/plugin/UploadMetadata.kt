@@ -20,7 +20,7 @@ open class UploadMetadata : SourceTask() {
     lateinit var url: String
 
     init {
-//        outputs.upToDateWhen { inputs }
+        outputs.upToDateWhen { true }
     }
 
     @TaskAction
