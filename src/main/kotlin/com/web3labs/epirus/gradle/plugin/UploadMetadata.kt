@@ -20,7 +20,7 @@ open class UploadMetadata : SourceTask() {
     lateinit var url: String
 
     init {
-        outputs.upToDateWhen { true }
+//        outputs.upToDateWhen { inputs }
     }
 
     @TaskAction
@@ -55,10 +55,10 @@ open class UploadMetadata : SourceTask() {
 
                 target.request().post(entity).apply {
                     when (statusInfo.toEnum()) {
-                        OK -> logger.info("$it.first metadata uploaded.")
+                        OK -> logger.info("${it.first} metadata uploaded.")
                         else -> logger.warn(
                             "Could not upload metadata for " +
-                                    "$it.first: ${statusInfo.reasonPhrase}"
+                                    "${it.first}: ${statusInfo.reasonPhrase}"
                         )
                     }
                 }

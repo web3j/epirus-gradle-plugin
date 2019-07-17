@@ -8,7 +8,7 @@ open class EpirusExtension {
     /**
      * Epirus platform URL.
      */
-    var url: String = "http://localhost:8080"
+    var url: String = "http://localhost/api"
 
     companion object {
         /**
