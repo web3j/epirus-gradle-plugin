@@ -38,13 +38,13 @@ class EpirusPlugin : Plugin<Project> {
         project.tasks.register("upload${srcSetName}Metadata", UploadMetadata::class.java).configure {
             val epirusExtension = project[EpirusExtension.NAME] as EpirusExtension
             it.dependsOn("compile${srcSetName}Solidity")
-            it.source = buildSourceDirectorySet(sourceSet)
+            it.source = buildMetaDirectorySet(sourceSet)
             it.group = EpirusExtension.NAME
             it.url = epirusExtension.url
         }
     }
 
-    private fun buildSourceDirectorySet(sourceSet: SourceSet): SourceDirectorySet {
+    private fun buildMetaDirectorySet(sourceSet: SourceSet): SourceDirectorySet {
         val displayName = "${sourceSet.name.capitalize()} Solidity Metadata"
 
         @Suppress("DEPRECATION")
