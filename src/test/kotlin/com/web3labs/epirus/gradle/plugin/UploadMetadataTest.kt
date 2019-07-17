@@ -56,6 +56,9 @@ class UploadMetadataTest {
                generatedPackageName = 'com.web3labs.epirus.test'
                includedContracts = ['StandardToken']
             }
+            epirus {
+                url = 'http://localhost:8080'
+            }
             sourceSets {
                main {
                    solidity {
@@ -89,7 +92,6 @@ class UploadMetadataTest {
             .withArguments("uploadMetadata")
             .withPluginClasspath()
             .forwardOutput()
-            .withDebug(true)
 
         val success = gradleRunner.build()
         assertNotNull(success.task(":uploadMetadata"))
