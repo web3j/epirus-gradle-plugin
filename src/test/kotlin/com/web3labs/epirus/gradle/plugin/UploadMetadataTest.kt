@@ -1,12 +1,13 @@
 package com.web3labs.epirus.gradle.plugin
 
-import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit.WireMockRule
+import com.github.tomakehurst.wiremock.matching.AnythingPattern
+import com.github.tomakehurst.wiremock.matching.MultipartValuePatternBuilder
 import com.github.tomakehurst.wiremock.matching.RegexPattern
-import com.github.tomakehurst.wiremock.matching.UrlPattern
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
+import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
@@ -16,6 +17,7 @@ import org.junit.rules.TemporaryFolder
 import java.io.File
 import java.nio.file.Files
 import javax.ws.rs.core.HttpHeaders.CONTENT_TYPE
+import javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA
 
 /**
  * Test for the `uploadMetadata` Gradle task.
@@ -74,14 +76,12 @@ class UploadMetadataTest {
     @Test
     fun uploadMetadata() {
         epirusMock.givenThat(
-            WireMock.get(UrlPattern(RegexPattern("/metadata/[0-9a-fA-F]+"), true))
-                .willReturn(notFound())
-        )
-
-        epirusMock.givenThat(
             post("/metadata")
-                .withHeader(CONTENT_TYPE, RegexPattern("multipart/form-data;boundary=.+"))
-                .willReturn(ok())
+                .withHeader(CONTENT_TYPE, RegexPattern(MEDIA_TYPE_REGEX))
+                .withMultipartRequestBody(
+                    MultipartValuePatternBuilder()
+                        .withBody(AnythingPattern())
+                ).willReturn(ok())
         )
 
         val gradleRunner = GradleRunner.create()
@@ -96,22 +96,17 @@ class UploadMetadataTest {
         assertEquals(SUCCESS, success.task(":uploadMetadata")!!.outcome)
 
         verify(
-            getRequestedFor(urlPathMatching("/metadata/[0-9a-fA-F]+"))
-        )
-
-        verify(
             postRequestedFor(urlEqualTo("/metadata"))
-                .withHeader(CONTENT_TYPE, matching("multipart/form-data;boundary=.+"))
+                .withHeader(CONTENT_TYPE, matching(MEDIA_TYPE_REGEX))
         )
 
-        // TODO Check second run is up to date 
-//        val upToDate = gradleRunner.build()
-//        assertNotNull(upToDate.task(":uploadMetadata"))
-//        assertEquals(UP_TO_DATE, upToDate.task(":uploadMetadata")!!.outcome)
+        // Check second run is up to date 
+        val upToDate = gradleRunner.build()
+        assertNotNull(upToDate.task(":uploadMetadata"))
+        assertEquals(UP_TO_DATE, upToDate.task(":uploadMetadata")!!.outcome)
     }
 
-    @Test
-    fun skipUploadExistingMetadata() {
-        // TODO When swarm hash check is implemented, add unit test
+    companion object {
+        private const val MEDIA_TYPE_REGEX = "$MULTIPART_FORM_DATA;boundary=.+"
     }
 }

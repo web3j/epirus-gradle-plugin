@@ -11,7 +11,6 @@ import org.web3j.gradle.plugin.Web3jExtension
 import java.io.File
 import javax.ws.rs.client.ClientBuilder
 import javax.ws.rs.client.Entity
-import javax.ws.rs.core.Response.Status.NOT_FOUND
 import javax.ws.rs.core.Response.Status.OK
 
 @CacheableTask
@@ -19,6 +18,10 @@ open class UploadMetadata : SourceTask() {
 
     @field:Input
     lateinit var url: String
+
+    init {
+        outputs.upToDateWhen { true }
+    }
 
     @TaskAction
     fun uploadMetadata() {
@@ -32,46 +35,34 @@ open class UploadMetadata : SourceTask() {
 
         val web3jExtension = project["web3j"] as Web3jExtension
 
-        source.asIterable().filter {
-            // Filter included / excluded contracts
-            if (web3jExtension.includedContracts.isNotEmpty()) {
-                web3jExtension.includedContracts.contains(it.contractName)
-            } else {
-                !web3jExtension.excludedContracts.contains(it.contractName)
-            }
-        }.forEach {
-            val contractName = it.contractName
-
-            val response = target.path("{swarmHash}")
-                .resolveTemplate("swarmHash", "dddd") // FIXME calculate swarm hash
-                .request()
-                .get()
-
-            when (response.statusInfo.toEnum()) {
-                NOT_FOUND -> {
-                    logger.info("Uploading metadata for $contractName...")
-
-                    val bodyPart = FileDataBodyPart("file", it)
-                    val multiPart = FormDataMultiPart().bodyPart(bodyPart)
-                    val entity = Entity.entity(multiPart, multiPart.mediaType)
-
-                    target.request().post(entity).apply {
-                        when (statusInfo.toEnum()) {
-                            OK -> logger.info("$contractName metadata uploaded.")
-                            else -> logger.warn(
-                                "Could not upload metadata for " +
-                                        "$contractName: ${statusInfo.reasonPhrase}"
-                            )
-                        }
+        source.asIterable()
+            .map { it.contractName to it }
+            .filter {
+                with(web3jExtension) {
+                    // Filter included / excluded contracts
+                    if (includedContracts.isNotEmpty()) {
+                        includedContracts.contains(it.first)
+                    } else {
+                        !excludedContracts.contains(it.first)
                     }
                 }
-                OK -> logger.info("$contractName metadata already exists, skipping.")
-                else -> logger.warn(
-                    "Epirus returned an unexpected error for " +
-                            "$contractName: ${response.statusInfo.reasonPhrase}"
-                )
+            }.forEach {
+                logger.info("Uploading metadata for $it.first...")
+
+                val bodyPart = FileDataBodyPart("file", it.second)
+                val multiPart = FormDataMultiPart().bodyPart(bodyPart)
+                val entity = Entity.entity(multiPart, multiPart.mediaType)
+
+                target.request().post(entity).apply {
+                    when (statusInfo.toEnum()) {
+                        OK -> logger.info("$it.first metadata uploaded.")
+                        else -> logger.warn(
+                            "Could not upload metadata for " +
+                                    "$it.first: ${statusInfo.reasonPhrase}"
+                        )
+                    }
+                }
             }
-        }
         client.close()
     }
 
