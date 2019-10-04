@@ -208,7 +208,7 @@ bintray {
     publish = true
     pkg {
         repo = 'maven'
-        name = 'web3j-gradle-plugin'
+        name = 'epirus-gradle-plugin'
         desc = project.description
         userOrg = 'web3j'
         licenses = ['Apache-2.0']
