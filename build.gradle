@@ -91,12 +91,12 @@ tasks.withType(Test) {
 }
 
 task javadocJar(type: Jar) {
-    classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
     from javadoc
 }
 
 task sourcesJar(type: Jar) {
-    classifier = 'sources'
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
 
@@ -104,20 +104,12 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
-
-            artifact sourcesJar {
-                classifier 'sources'
-            }
-
-            artifact javadocJar {
-                classifier 'javadoc'
-            }
-
+            artifact sourcesJar
+            artifact javadocJar
             pom {
                 name = project.name
                 description = project.description
                 url = "https://github.com/web3j/epirus-gradle-plugin"
-
                 licenses {
                     license {
                         name = "The Apache License, Version 2.0"
@@ -145,57 +137,24 @@ publishing {
             }
         }
     }
-}
-
-uploadArchives {
     repositories {
-        mavenDeployer {
-
-            onlyIf {
-                // Only run if this is a manual release triggered by a user, or an automated release for snapshots.
-                // We don't need to run this for automated releases.
-                isSnapshotVersion && ossrhUsername != '' && ossrhPassword != '' && ossrhRepoUrl != ''
+        maven {
+            name = 'ossrh'
+            url = ossrhRepoUrl
+            credentials {
+                username ossrhUsername
+                password ossrhPassword
             }
-
-            repository(url: ossrhRepoUrl) {
-                authentication(
-                        userName: ossrhUsername,
-                        password: ossrhPassword
-                )
+        }
+        maven {
+            name = 'ossrhSnapshots'
+            url = ossrhSnapshotRepoUrl
+            mavenContent {
+                snapshotsOnly()
             }
-
-            pom.project {
-                name project.name
-                packaging 'jar'
-                description project.description
-                url 'https://web3labs.com/'
-
-                scm {
-                    url 'https://github.com/web3j/epirus-gradle-plugin'
-                    connection 'scm:https://github.com/web3j/epirus-gradle-plugin.git'
-                    developerConnection 'scm:git://github.com/web3j/epirus-gradle-plugin.git'
-                }
-
-                licenses {
-                    license {
-                        name 'The Apache License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'conor10'
-                        name 'Conor Svensson'
-                        email 'conor10@gmail.com'
-                    }
-                    developer {
-                        id 'xaviarias'
-                        name 'Xavier Arias'
-                        email 'xavi.arias.segui@gmail.com'
-                    }
-                }
+            credentials {
+                username ossrhUsername
+                password ossrhPassword
             }
         }
     }
@@ -228,50 +187,5 @@ bintray {
                 close = '1'
             }
         }
-    }
-}
-
-task release {
-    dependsOn 'build'
-    dependsOn 'uploadArchives'
-
-    doLast {
-        // Validates the user inputs before a release can be performed.
-        if (isSnapshotVersion) {
-            // Only need OSSRH details.
-            logger.lifecycle("About to perform {} snapshot release ...", manualRelease ? "a manual" : "an automated")
-
-            if (!ossrhUsername || !ossrhPassword || !ossrhRepoUrl) {
-                throw new InvalidUserDataException("Required parameters missing:  'ossrhUsername', 'ossrhPassword', 'ossrhRepoUrl'")
-            }
-
-            logger.lifecycle(" - ossrhUsername={}", ossrhUsername)
-            logger.lifecycle(" - ossrhPassword={}", ossrhPassword ? "provided" : "not_provided")
-            logger.lifecycle(" - ossrhRepoUrl={}", ossrhRepoUrl)
-        } else {
-            // Release => Need OSSRH and bintray.
-            if (!ossrhUsername || !ossrhPassword || !ossrhRepoUrl) {
-                throw new InvalidUserDataException("Required parameters missing:  'ossrhUsername', 'ossrhPassword', 'ossrhRepoUrl'")
-            }
-            if (!bintrayUser || !bintrayKey || !bintrayGpgPassphrase) {
-                throw new InvalidUserDataException("Required parameters missing:  'bintrayUser', 'bintrayKey', 'bintrayGpgPassphrase'")
-            }
-            logger.lifecycle("About to perform {} full release ...", manualRelease ? "a manual" : "an automated")
-            logger.lifecycle(" - ossrhUsername={}", ossrhUsername)
-            logger.lifecycle(" - ossrhPassword={}", ossrhPassword ? "provided" : "not_provided")
-            logger.lifecycle(" - ossrhRepoUrl={}", ossrhRepoUrl)
-            logger.lifecycle(" - bintrayUser={}", bintrayUser)
-            logger.lifecycle(" - bintrayKey={}", bintrayKey ? "provided" : "not_provided")
-            logger.lifecycle(" - bintrayGpgPassphrase={}", bintrayGpgPassphrase ? "provided" : "not_provided")
-        }
-    }
-
-    // Snapshots go to nexus, non-snapshots go to bintray.
-    if (isSnapshotVersion) {
-        dependsOn 'uploadArchives'
-        tasks.findByName('uploadArchives').mustRunAfter 'build'
-    } else {
-        dependsOn 'bintrayUpload'
-        tasks.findByName('bintrayUpload').mustRunAfter 'build'
     }
 }
