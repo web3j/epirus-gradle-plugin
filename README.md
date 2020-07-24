@@ -18,11 +18,11 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.web3labs.epirus:epirus-gradle-plugin:1.0.0-SNAPSHOT'
+        classpath 'io.epirus:epirus-gradle-plugin:2.0.0'
     }
 }
 
-apply plugin: 'com.web3labs.epirus'
+apply plugin: 'io.epirus'
 ```
 
 ### Using the plugins DSL
@@ -32,7 +32,7 @@ build file:
 
 ```groovy
 plugins {
-    id 'com.web3labs.epirus' version '1.0.0-SNAPSHOT'
+    id 'io.epirus' version '2.0.0'
 }
 ```
 
