@@ -1,4 +1,4 @@
-package com.web3labs.epirus.gradle.plugin
+package io.epirus.gradle.plugin
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit.WireMockRule
@@ -50,7 +50,7 @@ class UploadMetadataTest {
 
         val buildFileContent = """
             plugins {
-               id 'com.web3labs.epirus'
+               id 'io.epirus'
             }
             web3j {
                generatedPackageName = 'com.web3labs.epirus.test'

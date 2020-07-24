@@ -1,4 +1,4 @@
-package com.web3labs.epirus.gradle.plugin
+package io.epirus.gradle.plugin
 
 import org.glassfish.jersey.media.multipart.FormDataMultiPart
 import org.glassfish.jersey.media.multipart.MultiPartFeature

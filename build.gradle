@@ -54,6 +54,7 @@ repositories {
 dependencies {
     implementation "org.web3j:web3j-gradle-plugin:$web3jVersion"
     implementation "org.web3j:solidity-gradle-plugin:$solidityPluginVersion"
+    implementation "de.undercouch:gradle-download-task:4.1.1"
     implementation "org.glassfish.jersey.core:jersey-client:$jerseyVersion"
     implementation "org.glassfish.jersey.media:jersey-media-multipart:$jerseyVersion"
     
@@ -68,8 +69,8 @@ dependencies {
 gradlePlugin {
     plugins {
         epirus {
-            id = 'com.web3labs.epirus'
-            implementationClass = 'com.web3labs.epirus.gradle.plugin.EpirusPlugin'
+            id = 'io.epirus'
+            implementationClass = 'io.epirus.gradle.plugin.EpirusPlugin'
         }
     }
 }

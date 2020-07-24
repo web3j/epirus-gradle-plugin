@@ -1,5 +1,6 @@
-package com.web3labs.epirus.gradle.plugin
+package io.epirus.gradle.plugin
 
+import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
@@ -26,8 +27,25 @@ class EpirusPlugin : Plugin<Project> {
         solidityExtension.setOutputComponents(*solidityExtension.outputComponents, OutputComponent.METADATA)
 
         target.afterEvaluate {
-            target.convention.getPlugin(JavaPluginConvention::class.java).sourceSets.all {
-                configure(target, it)
+            val plugin = target.convention.getPlugin(JavaPluginConvention::class.java)
+            plugin.sourceSets.all { sourceSet -> configure(target, sourceSet) }
+            configureCliInstaller(it)
+        }
+    }
+
+    private fun configureCliInstaller(project: Project) {
+        val installerPath = "${project.buildDir}/tmp/epirus-installer.sh"
+
+        project.tasks.register("installEpirusCli", Download::class.java).configure {
+            it.group = EpirusExtension.NAME
+            it.src("http://get.epirus.io")
+            it.dest(File(installerPath))
+            it.onlyIfModified(true)
+            it.doLast {
+                project.exec { task ->
+                    task.commandLine("chmod", "+x", installerPath)
+                    task.commandLine(installerPath)
+                }
             }
         }
     }
