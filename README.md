@@ -1,3 +1,7 @@
+# Archive Notice
+
+> This project is no longer under active development and has been archived. The repository is kept for historical purposes and read-only access. No further updates or pull requests will be considered.
+
 # Epirus Gradle Plugin
 
 Gradle Plugin for the [Epirus Platform](http://web3labs.com/) enabling the automation of smart contract lifecycle
